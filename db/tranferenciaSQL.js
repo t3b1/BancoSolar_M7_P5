@@ -6,29 +6,30 @@ pool.connect(err => {
     }
 })
 
-const formatoDate = (current_datetime) => {
-    let formated_date = current_datetime.getFullYear() + "-" + (current_datetime.getMonth() + 1) + "-" + current_datetime.getDate() + " " + current_datetime.getHours() + ":" + current_datetime.getMinutes() + ":" + current_datetime.getSeconds();
-    return formated_date;
-}
 async function readTransferencia() {
     try {
         const client = await pool.connect(),
-            respuesta = await client.query(`select fecha, emisores.nombre, receptores.nombre, monto
+            respuesta = await client.query({
+            text:`select transferencias.id, emisores.nombre, receptores.nombre, monto, fecha
             from transferencias
             join usuarios as emisores on emisor = emisores.id
-            join usuarios as receptores on receptor = receptores.id;`);
+            join usuarios as receptores on receptor = receptores.id;`,
+            rowMode: 'array'
+        });
+        let listar = respuesta.rows;
+        listar = listar.map(data => Object.values(data))
         client.release()
-        return respuesta.rows
+        return listar;
     } catch (error) {
         console.log(error);
     }
 }
-async function createTransferencia(emisor, receptor, monto, fecha) {
+async function createTransferencia(emisor, receptor, monto) {
     try {
         const client = await pool.connect()
               id_emisor = await client.query(`select id from usuarios where nombre='${emisor}'`),
               id_receptor = await client.query(`select id from usuarios where nombre='${receptor}'`);
-        await client.query(`insert into transferencias (emisor, receptor, monto,fecha) values (${id_emisor.rows[0].id},${id_receptor.rows[0].id},${monto},'${formatoDate(fecha)}')`)
+        await client.query(`insert into transferencias (emisor, receptor, monto) values (${id_emisor.rows[0].id},${id_receptor.rows[0].id},${monto})`)
         client.release()
     } catch (error) {
         console.log(error);

@@ -11,7 +11,7 @@ create table transferencias (
     emisor int ,
     receptor int,
     monto float,
-    fecha timestamp ,
+    fecha timestamp default now(),
     foreign key (emisor) references usuarios(id),
     foreign key (receptor) references usuarios(id)
 )

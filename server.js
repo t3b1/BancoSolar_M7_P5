@@ -63,12 +63,12 @@ app.post('/transferencia', async (req,res) => {
              emisor = datos.emisor,
              receptor = datos.receptor,
              monto = datos.monto
-        let fecha = new Date()
-        await createTransferencia(emisor, receptor, monto, fecha)
-        res.end()
+        await createTransferencia(emisor, receptor, monto)
+        
     } catch (error) {
         console.log(error);
     }
+    res.json({})
 })
 
 app.get('/transferencias', async (req,res) => {

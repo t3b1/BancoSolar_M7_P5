@@ -41,6 +41,7 @@ async function update(nombre, balance, id) {
 async function eliminar(id) {
     try {
         const client = await pool.connect()
+        await client.query(`delete from transferencias where emisor=${id} or receptor=${id}`)
         await client.query(`DELETE FROM usuarios WHERE id=${id};`)
         client.release()
     } catch (error) {
