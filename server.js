@@ -1,7 +1,7 @@
 const express = require('express'),
       f = require('./funtionForm.js'),
-      { read, create, update, eliminar} = require('./cosultaSQL.js'),
-      { readTransferencia, createTransferencia } = require('./tranferenciaSQL.js');
+      { read, create, update, eliminar} = require('./db/cosultaSQL.js'),
+      { readTransferencia, createTransferencia } = require('./db/tranferenciaSQL.js');
 
 const app = express()
 
@@ -12,48 +12,72 @@ app.get('/',async (req,res)=>{
 })
 
 app.post('/usuario', async (req,res) => {
-    const datos = await f.getForm(req),
-          nombre = datos.nombre,
-          balance = datos.balance
-    await create(nombre, balance)
-    res.end()
+    try {
+        const datos = await f.getForm(req),
+              nombre = datos.nombre,
+              balance = datos.balance
+        await create(nombre, balance)
+        res.end()
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 app.get('/usuarios', async (req,res) => {
-    const datos = await read()
-    res.json(datos)
+    try {
+        const datos = await read()
+        res.json(datos)
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 app.put('/usuario', async (req,res) => {
-    const datos = await f.getForm(req),
-          nombre = datos.name,
-          balance = datos.balance,
-          id = req.query.id;
-    await update(nombre, balance, id)
-    res.end()
+    try {
+        const datos = await f.getForm(req),
+              nombre = datos.name,
+              balance = datos.balance,
+              id = req.query.id;
+        await update(nombre, balance, id)
+        res.end()
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 app.delete('/usuario', async (req,res) => {
-    const id = req.query.id;
-    await eliminar(id)
-    res.end()        
+    try {
+        const id = req.query.id;
+        await eliminar(id)
+        res.end()        
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 // rutas tabla transferencia
 
 app.post('/transferencia', async (req,res) => {
-    const datos = await f.getForm(req),
-         emisor = datos.emisor,
-         receptor = datos.receptor,
-         monto = datos.monto
-    let fecha = new Date()
-    await createTransferencia(emisor, receptor, monto, fecha)
-    res.end()
+    try {
+        const datos = await f.getForm(req),
+             emisor = datos.emisor,
+             receptor = datos.receptor,
+             monto = datos.monto
+        let fecha = new Date()
+        await createTransferencia(emisor, receptor, monto, fecha)
+        res.end()
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 app.get('/transferencias', async (req,res) => {
-    const datos = await readTransferencia()
-    res.json(datos)
+    try {
+        const datos = await readTransferencia()
+        res.json(datos)
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 
