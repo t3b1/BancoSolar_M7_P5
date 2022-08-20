@@ -1,5 +1,5 @@
 function validarIngreso (monto) {
-    let montof = parseInt(monto)
+    const montof = parseInt(monto)
     if(isNaN(montof)) {
         throw 'valor no valido'
     }
@@ -9,7 +9,7 @@ function validarIngreso (monto) {
 }
 
 function validarMonto(objEmisor, monto) {
-    let montof = parseInt(monto)
+    const montof = parseInt(monto)
     if (objEmisor.rows[0].balance < montof) {
         throw 'el monto es mayor a su balance'
     }
@@ -21,12 +21,12 @@ function validarCliente(objEmisor, objReceptor){
     }
 }
 function sumaMonto (objReceptor, monto) {
-    let montof = parseInt(monto)
+    const montof = parseInt(monto)
     deposito = objReceptor.rows[0].balance + montof
     return deposito
 }
 function restaMonto (objEmisor, monto) {
-    let montof = parseInt(monto)
+    const montof = parseInt(monto)
     descuento = objEmisor.rows[0].balance - montof
     return descuento
 }

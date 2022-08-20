@@ -36,11 +36,7 @@ async function createTransferencia(emisor, receptor, monto) {
     validarMonto(objEmisor, monto)
     validarCliente(objEmisor, objReceptor)
 
-    try {
-       
-        /*const descuento = restaMonto(objEmisor, monto),
-              deposito  = sumaMonto(objReceptor, monto);*/
-              
+    try {          
         await client.query(`update usuarios set balance=${restaMonto(objEmisor, monto)} where id=${objEmisor.rows[0].id}`)
         await client.query(`update usuarios set balance=${sumaMonto(objReceptor, monto)} where id=${objReceptor.rows[0].id}`)
         await client.query(`insert into transferencias (emisor, receptor, monto) values (${objEmisor.rows[0].id},${objReceptor.rows[0].id},${monto})`)
