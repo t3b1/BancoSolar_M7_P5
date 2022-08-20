@@ -58,13 +58,12 @@ app.delete('/usuario', async (req,res) => {
 // rutas tabla transferencia
 
 app.post('/transferencia', async (req,res) => {
+    const datos = await f.getForm(req),
+         emisor = datos.emisor,
+         receptor = datos.receptor,
+         monto = datos.monto
     try {
-        const datos = await f.getForm(req),
-             emisor = datos.emisor,
-             receptor = datos.receptor,
-             monto = datos.monto
         await createTransferencia(emisor, receptor, monto)
-        
     } catch (error) {
         res.statusCode = 400
         return res.json({error: error})

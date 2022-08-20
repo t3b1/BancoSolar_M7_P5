@@ -15,18 +15,22 @@ function validarMonto(objEmisor, monto) {
     }
 }
 
-function validarCliente(objEmisor, id_receptor){
-    if (objEmisor.rows[0].id === id_receptor.rows[0].id){
+function validarCliente(objEmisor, objReceptor){
+    if (objEmisor.rows[0].id === objReceptor.rows[0].id){
         throw 'no puede transferir a la misma cuenta'
     }
 }
-/*function sumaresta (balance_emisor, balance_receptor, monto) {
+function sumaMonto (objReceptor, monto) {
     let montof = parseInt(monto)
-    const descuento = balance_emisor.rows[0].balance - montof,
-          deposito = balance_receptor.rows[0].balance + montof
-    return descuento, deposito;
-}*/
+    deposito = objReceptor.rows[0].balance + montof
+    return deposito
+}
+function restaMonto (objEmisor, monto) {
+    let montof = parseInt(monto)
+    descuento = objEmisor.rows[0].balance - montof
+    return descuento
+}
 
 module.exports = {
-    validarIngreso, validarMonto, validarCliente
+    validarIngreso, validarMonto, validarCliente, sumaMonto, restaMonto
 }

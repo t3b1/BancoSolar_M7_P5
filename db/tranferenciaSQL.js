@@ -1,5 +1,5 @@
 const pool = require('./conexionDB.js')
-const { validarIngreso, validarMonto, validarCliente } = require('../funcionValidar.js');
+const { validarIngreso, validarMonto, validarCliente, sumaMonto, restaMonto } = require('../funcionValidar.js');
 
 pool.connect(err => {
     if (err) {
@@ -31,18 +31,19 @@ async function createTransferencia(emisor, receptor, monto) {
 
     const client = await pool.connect()
     const objEmisor = await client.query(`select * from usuarios where nombre='${emisor}'`),
-          id_receptor = await client.query(`select * from usuarios where nombre='${receptor}'`);
+          objReceptor = await client.query(`select * from usuarios where nombre='${receptor}'`);
 
     validarMonto(objEmisor, monto)
-    validarCliente(objEmisor, id_receptor)
+    validarCliente(objEmisor, objReceptor)
 
     try {
-        const descuento = objEmisor.rows[0].balance - monto,
-              deposito = (id_receptor.rows[0].balance + monto);
+       
+        /*const descuento = restaMonto(objEmisor, monto),
+              deposito  = sumaMonto(objReceptor, monto);*/
               
-        await client.query(`update usuarios set balance=${descuento} where id=${objEmisor.rows[0].id}`)
-        await client.query(`update usuarios set balance=${deposito} where id=${id_receptor.rows[0].id}`)
-        await client.query(`insert into transferencias (emisor, receptor, monto) values (${objEmisor.rows[0].id},${id_receptor.rows[0].id},${monto})`)
+        await client.query(`update usuarios set balance=${restaMonto(objEmisor, monto)} where id=${objEmisor.rows[0].id}`)
+        await client.query(`update usuarios set balance=${sumaMonto(objReceptor, monto)} where id=${objReceptor.rows[0].id}`)
+        await client.query(`insert into transferencias (emisor, receptor, monto) values (${objEmisor.rows[0].id},${objReceptor.rows[0].id},${monto})`)
     } catch (error) {
         console.log(error);
     }

@@ -16,4 +16,4 @@ _ Proyecto que se pide hacer un CRUD para ejercicio BancoSolar con la libreria p
  github (t3b1)
 
 ### Proceso 🔧
-- en contruccion 
+- terminado
