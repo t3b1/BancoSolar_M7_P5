@@ -1,4 +1,5 @@
 const pool = require('./conexionDB.js')
+const { validarIngreso, validarMonto, validarCliente } = require('../funcionValidar.js');
 
 pool.connect(err => {
     if (err) {
@@ -7,9 +8,9 @@ pool.connect(err => {
 })
 
 async function readTransferencia() {
+    const client = await pool.connect()
     try {
-        const client = await pool.connect(),
-            respuesta = await client.query({
+            const respuesta = await client.query({
             text:`select transferencias.id, emisores.nombre, receptores.nombre, monto, fecha
             from transferencias
             join usuarios as emisores on emisor = emisores.id
@@ -18,22 +19,34 @@ async function readTransferencia() {
         });
         let listar = respuesta.rows;
         listar = listar.map(data => Object.values(data))
-        client.release()
         return listar;
     } catch (error) {
         console.log(error);
     }
+    client.release()
 }
 async function createTransferencia(emisor, receptor, monto) {
+    
+    validarIngreso(monto)
+
+    const client = await pool.connect()
+    const objEmisor = await client.query(`select * from usuarios where nombre='${emisor}'`),
+          id_receptor = await client.query(`select * from usuarios where nombre='${receptor}'`);
+
+    validarMonto(objEmisor, monto)
+    validarCliente(objEmisor, id_receptor)
+
     try {
-        const client = await pool.connect()
-              id_emisor = await client.query(`select id from usuarios where nombre='${emisor}'`),
-              id_receptor = await client.query(`select id from usuarios where nombre='${receptor}'`);
-        await client.query(`insert into transferencias (emisor, receptor, monto) values (${id_emisor.rows[0].id},${id_receptor.rows[0].id},${monto})`)
-        client.release()
+        const descuento = objEmisor.rows[0].balance - monto,
+              deposito = (id_receptor.rows[0].balance + monto);
+              
+        await client.query(`update usuarios set balance=${descuento} where id=${objEmisor.rows[0].id}`)
+        await client.query(`update usuarios set balance=${deposito} where id=${id_receptor.rows[0].id}`)
+        await client.query(`insert into transferencias (emisor, receptor, monto) values (${objEmisor.rows[0].id},${id_receptor.rows[0].id},${monto})`)
     } catch (error) {
         console.log(error);
     }
+    client.release()
 }
 
 

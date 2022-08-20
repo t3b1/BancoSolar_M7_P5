@@ -66,7 +66,8 @@ app.post('/transferencia', async (req,res) => {
         await createTransferencia(emisor, receptor, monto)
         
     } catch (error) {
-        console.log(error);
+        res.statusCode = 400
+        return res.json({error: error})
     }
     res.json({})
 })
