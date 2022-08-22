@@ -27,19 +27,21 @@ async function readTransferencia() {
 }
 async function createTransferencia(emisor, receptor, monto) {
     
-    validarIngreso(monto)
-
     const client = await pool.connect()
-    const objEmisor = await client.query(`select * from usuarios where nombre='${emisor}'`),
-          objReceptor = await client.query(`select * from usuarios where nombre='${receptor}'`);
+    validarIngreso(monto)
+    const objEmisor = await client.query(`select * from usuarios where nombre='$1'`,[emisor]),
+          objReceptor = await client.query(`select * from usuarios where nombre='$2'`,[receptor]);
 
     validarMonto(objEmisor, monto)
     validarCliente(objEmisor, objReceptor)
 
     try {          
-        await client.query(`update usuarios set balance=${restaMonto(objEmisor, monto)} where id=${objEmisor.rows[0].id}`)
-        await client.query(`update usuarios set balance=${sumaMonto(objReceptor, monto)} where id=${objReceptor.rows[0].id}`)
-        await client.query(`insert into transferencias (emisor, receptor, monto) values (${objEmisor.rows[0].id},${objReceptor.rows[0].id},${monto})`)
+        await client.query(`update usuarios set balance=$1 where id=$2`,
+        [restaMonto(objEmisor, monto), objEmisor.rows[0].id])
+        await client.query(`update usuarios set balance=$1 where id=$2`,
+        [sumaMonto(objReceptor, monto),objReceptor.rows[0].id])
+        await client.query(`insert into transferencias (emisor, receptor, monto) values ($1,$2,$3)`,
+        objEmisor.rows[0].id, objReceptor.rows[0].id, monto)
     } catch (error) {
         console.log(error);
     }

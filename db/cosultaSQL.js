@@ -19,7 +19,7 @@ async function read() {
 async function create(nombre, balance) {
     const client = await pool.connect()
     try {
-        await client.query(`insert into usuarios (nombre, balance) values ('${nombre}', ${balance}) returning *`)
+        await client.query(`insert into usuarios (nombre, balance) values ('$1', $2) returning *`,[nombre,balance])
     } catch (error) {
         console.log(error);
     }
@@ -29,7 +29,7 @@ async function create(nombre, balance) {
 async function update(nombre, balance, id) {
     const client = await pool.connect()
     try {
-        await client.query(`update usuarios set nombre='${nombre}', balance=${balance} where id=${id}`)
+        await client.query(`update usuarios set nombre='$1', balance=$2 where id=$3`,[nombre,balance,id])
     } catch (error) {
         console.log(error);
     }
@@ -39,8 +39,8 @@ async function update(nombre, balance, id) {
 async function eliminar(id) {
     const client = await pool.connect()
     try {
-        await client.query(`delete from transferencias where emisor=${id} or receptor=${id}`)
-        await client.query(`DELETE FROM usuarios WHERE id=${id};`)
+        await client.query(`delete from transferencias where emisor=$1 or receptor=$1`,[id])
+        await client.query(`DELETE FROM usuarios WHERE id=$1;`,[id])
     } catch (error) {
         console.log(error);
     }
